@@ -389,7 +389,7 @@ cmd_show() {
 		else
 			[[ $selected_line =~ ^[0-9]+$ ]] || die "Clip location '$selected_line' is not a number."
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | tail -n +${selected_line} | head -n 1)" || exit $?
-			[[ -n $pass ]] || die "There is no password to put on the clipboard at line ${selected_line}."
+			[[ -n $pass ]] || die "There is no password at line ${selected_line}."
 			if [[ $clip -eq 1 ]]; then
 				clip "$pass" "$path"
 			elif [[ $qrcode -eq 1 ]]; then
