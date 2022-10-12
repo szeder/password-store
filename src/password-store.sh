@@ -377,14 +377,15 @@ cmd_show() {
 		--) shift; break ;;
 	esac done
 
-	[[ $err -ne 0 || ( $qrcode -eq 1 && $clip -eq 1 ) ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [pass-name]"
+	local output_opts=$(( $qrcode + $clip ))
+	[[ $err -ne 0 || $output_opts -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [pass-name]"
 
 	local pass
 	local path="$1"
 	local passfile="$PREFIX/$path.gpg"
 	check_sneaky_paths "$path"
 	if [[ -f $passfile ]]; then
-		if [[ $clip -eq 0 && $qrcode -eq 0 ]]; then
+		if [[ $output_opts -eq 0 ]]; then
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | $BASE64)" || exit $?
 			echo "$pass" | $BASE64 -d
 		else
