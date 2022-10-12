@@ -146,10 +146,22 @@ check_sneaky_paths() {
 	done
 }
 
+# Like 'grep', but it returns 0 even if no matches were found, to avoid
+# triggering '-o pipefail'.
+grep_gently() {
+	grep "$@"
+	true
+}
+
 # Extract the given line from standard input.
 extract_one_line() {
 	local selected_line="$1"
-	tail -n +"$selected_line" | head -n 1
+	if [[ "$selected_line" =~ ^[0-9]+$ ]]; then
+		tail -n +$selected_line
+	else
+		grep_gently "^$selected_line: "
+	fi |
+	head -n 1
 }
 
 #
@@ -290,10 +302,11 @@ cmd_usage() {
 	        List passwords.
 	    $PROGRAM find pass-names...
 	    	List passwords that match pass-names.
-	    $PROGRAM [show] [--clip[=line-number],-c[line-number],--qrcode[=line-number],-q[line-number],--stdout[=line-number],-s[line-number] [--strip-field]] pass-name
+	    $PROGRAM [show] [--clip[=line-selector],-c[line-selector],--qrcode[=line-selector],-q[line-selector],--stdout[=line-selector],-s[line-selector] [--strip-field]] pass-name
 	        Show existing password and optionally put it on the clipboard or display as QR code.
 	        If put on the clipboard, it will be cleared in $CLIP_TIME seconds.
-	        If a line-number is given, then only that line will be copied, displayed or printed from a multiline password.
+	        If a line-selector is given, then only one line will be copied, displayed or printed from a multiline password.
+	        If line-selector is a number, then it selects the Nth line; otherwise it is treated as a field name, and the first line with the matching field is selected.
 	    $PROGRAM grep [GREPOPTIONS] search-string
 	        Search for password files containing search-string when decrypted.
 	    $PROGRAM insert [--echo,-e | --multiline,-m] [--force,-f] pass-name
@@ -398,7 +411,6 @@ cmd_show() {
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | $BASE64)" || exit $?
 			echo "$pass" | $BASE64 -d
 		else
-			[[ $selected_line =~ ^[0-9]+$ ]] || die "Clip location '$selected_line' is not a number."
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | extract_one_line "$selected_line")" || exit $?
 			[[ $strip_field -eq 1 ]] && pass="${pass#*: }"
 			[[ -n $pass ]] || die "There is no password at line ${selected_line}."

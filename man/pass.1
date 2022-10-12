@@ -94,7 +94,7 @@ List names of passwords inside the tree that match \fIpass-names\fP by using the
 .BR tree (1)
 program. This command is alternatively named \fBsearch\fP.
 .TP
-\fBshow\fP [ \fI--clip\fP[=\fIline-number\fP], \fI-c\fP[\fIline-number\fP] ] [ \fI--qrcode\fP[=\fIline-number\fP], \fI-q\fP[\fIline-number\fP] ] [ \fI--stdout\fP[=\fIline-number\fP], \fI-s\fP[\fIline-number\fP] ] [ \fI--strip-field\fP ] \fIpass-name\fP
+\fBshow\fP [ \fI--clip\fP[=\fIline-selector\fP], \fI-c\fP[\fIline-selector\fP] ] [ \fI--qrcode\fP[=\fIline-selector\fP], \fI-q\fP[\fIline-selector\fP] ] [ \fI--stdout\fP[=\fIline-selector\fP], \fI-s\fP[\fIline-selector\fP] ] [ \fI--strip-field\fP ] \fIpass-name\fP
 Decrypt and print a password named \fIpass-name\fP. If \fI--clip\fP or \fI-c\fP
 is specified, do not print the password but instead copy the first (or otherwise specified)
 line to the clipboard using
@@ -104,8 +104,11 @@ or
 and then restore the clipboard after 45 (or \fIPASSWORD_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
 or \fI-q\fP is specified, do not print the password but instead display a QR code using
 .BR qrencode (1)
-either to the terminal or graphically if supported.  If \fIline-number\fP is specified,
+either to the terminal or graphically if supported.  If \fIline-selector\fP is specified,
 then only that line will be copied, displayed or printed from a multiline password.
+If \fIline-selector\fP is a number, then it selects the Nth line; otherwise it
+is treated as a field name, and the first line with the matching field is
+selected.
 .TP
 \fBinsert\fP [ \fI--echo\fP, \fI-e\fP | \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIpass-name\fP
 Insert a new password into the password store called \fIpass-name\fP. This will
@@ -272,6 +275,21 @@ line
 passworrrrrrrrd. 
 .br
 ^D 
+.TP
+Print the content of a specific line from a multiline password file without the field name prefix
+.B zx2c4@laptop ~ $ pass show example.com
+.br
+abie4lohTi8geif4
+.br
+login: john.doe@example.com
+.br
+URL: *.example.com/*
+.br
+app-password: bae2vohnohth3Bahphei
+.br
+.B zx2c4@laptop ~ $ pass show --stdout=app-password --strip-field example.com
+.br
+bae2vohnohth3Bahphei
 .TP
 Generate new password
 .B zx2c4@laptop ~ $ pass generate Email/jasondonenfeld.com 15 
