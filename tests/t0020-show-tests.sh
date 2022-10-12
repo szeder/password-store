@@ -24,4 +24,27 @@ test_expect_success 'Test "show" of nonexistant password' '
 	test_must_fail "$PASS" show cred2
 '
 
+test_expect_success 'Test "show" command with multiline password' '
+	cat >content <<-\EOF &&
+	p4$$w0rd
+	second: twotwo
+	third: threethree
+	fourth: fourfour
+	EOF
+	"$PASS" insert -m multiline <content &&
+	"$PASS" show multiline >actual &&
+	test_cmp content actual
+'
+
+test_expect_success 'Test "show --stdout"' '
+	echo "second: twotwo" >expect &&
+	"$PASS" show --stdout=2 multiline >actual &&
+	test_cmp expect actual
+'
+
+test_expect_success 'Test "show --stdout" with out-of-range line-number' '
+	test_must_fail "$PASS" show --stdout=42 multiline 2>stderr &&
+	grep "There is no password at line 42" stderr
+'
+
 test_done

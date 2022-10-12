@@ -119,7 +119,9 @@ _pass_cmd_show () {
 		"-c[put it on the clipboard]" \
 		"--clip[put it on the clipboard]" \
 		"-q[display QR code]" \
-		"--qrcode[display QR code]"
+		"--qrcode[display QR code]" \
+		"-s[print to standard output]" \
+		"--stdout[print to standard output]"
 	_pass_complete_entries
 }
 _pass_complete_entries_helper () {

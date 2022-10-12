@@ -372,25 +372,26 @@ cmd_init() {
 }
 
 cmd_show() {
-	local opts selected_line clip=0 qrcode=0
-	opts="$($GETOPT -o q::c:: -l qrcode::,clip:: -n "$PROGRAM" -- "$@")"
+	local opts selected_line stdout=0 clip=0 qrcode=0
+	opts="$($GETOPT -o s::q::c:: -l stdout::,qrcode::,clip:: -n "$PROGRAM" -- "$@")"
 	local err=$?
 	eval set -- "$opts"
 	while true; do case $1 in
+		-s|--stdout) stdout=1; selected_line="${2:-1}"; shift 2 ;;
 		-q|--qrcode) qrcode=1; selected_line="${2:-1}"; shift 2 ;;
 		-c|--clip) clip=1; selected_line="${2:-1}"; shift 2 ;;
 		--) shift; break ;;
 	esac done
 
-	local output_opts=$(( $qrcode + $clip ))
-	[[ $err -ne 0 || $output_opts -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [pass-name]"
+	local output_opts=$(( $stdout + $qrcode + $clip ))
+	[[ $err -ne 0 || $output_opts -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [--stdout[=line-number],-s[line-number]] [pass-name]"
 
 	local pass
 	local path="$1"
 	local passfile="$PREFIX/$path.gpg"
 	check_sneaky_paths "$path"
 	if [[ -f $passfile ]]; then
-		if [[ $clip -eq 0 && $qrcode -eq 0 ]]; then
+		if [[ $stdout -eq 0 && $clip -eq 0 && $qrcode -eq 0 ]]; then
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | $BASE64)" || exit $?
 			echo "$pass" | $BASE64 -d
 		else
@@ -401,6 +402,8 @@ cmd_show() {
 				clip "$pass" "$path"
 			elif [[ $qrcode -eq 1 ]]; then
 				qrcode "$pass" "$path"
+			elif [[ $stdout -eq 1 ]]; then
+				printf '%s\n' "$pass"
 			fi
 		fi
 	elif [[ -d $PREFIX/$path ]]; then
