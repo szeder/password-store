@@ -146,12 +146,25 @@ check_sneaky_paths() {
 	done
 }
 
+# Like 'grep', but it returns 0 even if no matches were found.
+grep_gently() {
+	local ret
+	grep "$@"
+	ret=$?
+	[[ $ret -eq 1 ]] && ret=0
+	return $ret
+}
+
 # Extract the given line from standard input.
 extract_one_line() {
 	# Make sure that each pipeline stage reads the whole input to
 	# avoid SIGPIPE.
 	local selected_line="$1"
-	tail -n +"$selected_line" |
+	if [[ "$selected_line" =~ ^[0-9]+$ ]]; then
+		tail -n +$selected_line
+	else
+		grep_gently "^$selected_line: "
+	fi |
 	{ head -n 1 ; cat >/dev/null ; }
 }
 
@@ -400,7 +413,6 @@ cmd_show() {
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | $BASE64)" || exit $?
 			echo "$pass" | $BASE64 -d
 		else
-			[[ $selected_line =~ ^[0-9]+$ ]] || die "Clip location '$selected_line' is not a number."
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | extract_one_line "$selected_line")" || exit $?
 			[[ $strip_field -eq 1 ]] && pass="${pass#*: }"
 			[[ -n $pass ]] || die "There is no password at line ${selected_line}."

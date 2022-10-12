@@ -60,6 +60,23 @@ test_expect_success 'Test "show --stdout" with out-of-range line-number' '
 	grep "There is no password at line 42" stderr
 '
 
+test_expect_success 'Test "show --stdout=<field>"' '
+	echo "third: threethree" >expect &&
+	"$PASS" show --stdout=third multiline >actual &&
+	test_cmp expect actual
+'
+
+test_expect_success 'Test "show --stdout=<field> --strip-field"' '
+	echo "fourfour" >expect &&
+	"$PASS" show --stdout=fourth --strip-field multiline >actual &&
+	test_cmp expect actual
+'
+
+test_expect_success 'Test "show --stdout=<field>" with non-existing field' '
+	test_must_fail "$PASS" show --stdout=nope multiline 2>stderr &&
+	grep "There is no password at line nope" stderr
+'
+
 test_expect_success 'Huge password file should not lead to SIGPIPE' '
 	echo PaSSWoRD >expect &&
 	cat expect >content &&
