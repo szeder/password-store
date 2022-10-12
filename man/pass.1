@@ -94,7 +94,7 @@ List names of passwords inside the tree that match \fIpass-names\fP by using the
 .BR tree (1)
 program. This command is alternatively named \fBsearch\fP.
 .TP
-\fBshow\fP [ \fI--clip\fP[=\fIline-number\fP], \fI-c\fP[\fIline-number\fP] ] [ \fI--qrcode\fP[=\fIline-number\fP], \fI-q\fP[\fIline-number\fP] ] \fIpass-name\fP
+\fBshow\fP [ \fI--clip\fP[=\fIline-number\fP], \fI-c\fP[\fIline-number\fP] ] [ \fI--qrcode\fP[=\fIline-number\fP], \fI-q\fP[\fIline-number\fP] ] [ \fI--stdout\fP[=\fIline-number\fP], \fI-s\fP[\fIline-number\fP] ] \fIpass-name\fP
 Decrypt and print a password named \fIpass-name\fP. If \fI--clip\fP or \fI-c\fP
 is specified, do not print the password but instead copy the first (or otherwise specified)
 line to the clipboard using
@@ -105,7 +105,7 @@ and then restore the clipboard after 45 (or \fIPASSWORD_STORE_CLIP_TIME\fP) seco
 or \fI-q\fP is specified, do not print the password but instead display a QR code using
 .BR qrencode (1)
 either to the terminal or graphically if supported.  If \fIline-number\fP is specified,
-then only that line will be copied or displayed from a multiline password.
+then only that line will be copied, displayed or printed from a multiline password.
 .TP
 \fBinsert\fP [ \fI--echo\fP, \fI-e\fP | \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIpass-name\fP
 Insert a new password into the password store called \fIpass-name\fP. This will

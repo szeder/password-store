@@ -290,10 +290,10 @@ cmd_usage() {
 	        List passwords.
 	    $PROGRAM find pass-names...
 	    	List passwords that match pass-names.
-	    $PROGRAM [show] [--clip[=line-number],-c[line-number],--qrcode[=line-number],-q[line-number]] pass-name
+	    $PROGRAM [show] [--clip[=line-number],-c[line-number],--qrcode[=line-number],-q[line-number],--stdout[=line-number],-s[line-number]] pass-name
 	        Show existing password and optionally put it on the clipboard or display as QR code.
 	        If put on the clipboard, it will be cleared in $CLIP_TIME seconds.
-	        If a line-number is given, then only that line will be copied or displayed from a multiline password.
+	        If a line-number is given, then only that line will be copied, displayed or printed from a multiline password.
 	    $PROGRAM grep [GREPOPTIONS] search-string
 	        Search for password files containing search-string when decrypted.
 	    $PROGRAM insert [--echo,-e | --multiline,-m] [--force,-f] pass-name
@@ -373,18 +373,19 @@ cmd_init() {
 }
 
 cmd_show() {
-	local opts selected_line clip=0 qrcode=0
-	opts="$($GETOPT -o q::c:: -l qrcode::,clip:: -n "$PROGRAM" -- "$@")"
+	local opts selected_line clip=0 qrcode=0 stdout=0
+	opts="$($GETOPT -o q::c::s:: -l qrcode::,clip::,stdout:: -n "$PROGRAM" -- "$@")"
 	local err=$?
 	eval set -- "$opts"
 	while true; do case $1 in
 		-q|--qrcode) qrcode=1; selected_line="${2:-1}"; shift 2 ;;
 		-c|--clip) clip=1; selected_line="${2:-1}"; shift 2 ;;
+		-s|--stdout) stdout=1; selected_line="${2:-1}"; shift 2 ;;
 		--) shift; break ;;
 	esac done
 
-	local output_opts=$(( $qrcode + $clip ))
-	[[ $err -ne 0 || $output_opts -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [pass-name]"
+	local output_opts=$(( $qrcode + $clip + $stdout ))
+	[[ $err -ne 0 || $output_opts -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [--stdout[=line-number],-s[line-number]] [pass-name]"
 
 	local pass
 	local path="$1"
@@ -402,6 +403,8 @@ cmd_show() {
 				clip "$pass" "$path"
 			elif [[ $qrcode -eq 1 ]]; then
 				qrcode "$pass" "$path"
+			elif [[ $stdout -eq 1 ]]; then
+				printf '%s\n' "$pass"
 			fi
 		fi
 	elif [[ -d $PREFIX/$path ]]; then

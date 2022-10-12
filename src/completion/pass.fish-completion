@@ -98,15 +98,19 @@ complete -c $PROG -f -n '__fish_pass_uses_command edit' -a "(__fish_pass_print_e
 complete -c $PROG -f -n '__fish_pass_needs_command' -a show -d 'Command: show existing password'
 complete -c $PROG -f -n '__fish_pass_uses_command show' -s c -l clip -d 'Put password in clipboard'
 complete -c $PROG -f -n '__fish_pass_uses_command show' -s q -l qrcode -d 'Display QR code'
+complete -c $PROG -f -n '__fish_pass_uses_command show' -s s -l stdout -d 'Print to standard output'
 complete -c $PROG -f -n '__fish_pass_uses_command show' -a "(__fish_pass_print_entries)"
 # When no command is given, `show` is defaulted.
 complete -c $PROG -f -n '__fish_pass_needs_command' -s c -l clip -d 'Put password in clipboard'
 complete -c $PROG -f -n '__fish_pass_needs_command' -s q -l qrcode -d 'Display QR code'
+complete -c $PROG -f -n '__fish_pass_needs_command' -s s -l stdout -d 'Print to standard output'
 complete -c $PROG -f -n '__fish_pass_needs_command' -a "(__fish_pass_print_entries)"
 complete -c $PROG -f -n '__fish_pass_uses_command -c' -a "(__fish_pass_print_entries)"
 complete -c $PROG -f -n '__fish_pass_uses_command --clip' -a "(__fish_pass_print_entries)"
 complete -c $PROG -f -n '__fish_pass_uses_command -q' -a "(__fish_pass_print_entries)"
 complete -c $PROG -f -n '__fish_pass_uses_command --qrcode' -a "(__fish_pass_print_entries)"
+complete -c $PROG -f -n '__fish_pass_uses_command -s' -a "(__fish_pass_print_entries)"
+complete -c $PROG -f -n '__fish_pass_uses_command --stdout' -a "(__fish_pass_print_entries)"
 
 complete -c $PROG -f -n '__fish_pass_needs_command' -a git -d 'Command: execute a git command'
 complete -c $PROG -f -n '__fish_pass_uses_command git' -a '(__fish_pass_git_complete)'
