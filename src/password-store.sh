@@ -161,7 +161,9 @@ extract_one_line() {
 	else
 		grep_gently "^$selected_line: "
 	fi |
-	head -n 1
+	# Make sure that the last pipeline stage reads the whole output of
+	# the previous stage to avoid SIGPIPE.
+	{ head -n 1 ; cat >/dev/null ; }
 }
 
 #

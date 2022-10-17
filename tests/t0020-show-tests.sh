@@ -90,4 +90,13 @@ test_expect_success 'Test "show --stdout=<field>" with non-existing field' '
 	grep "There is no password at line nope" stderr
 '
 
+test_expect_success 'Huge password file should not lead to SIGPIPE' '
+	echo 42 >expect &&
+	seq 1 100000 >content &&
+	"$PASS" insert -m huge <content &&
+	"$PASS" show --stdout=42 huge >actual 2>err &&
+	test_cmp expect actual &&
+	test ! -s err
+'
+
 test_done
