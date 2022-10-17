@@ -146,6 +146,12 @@ check_sneaky_paths() {
 	done
 }
 
+# Extract the given line from standard input.
+extract_one_line() {
+	local selected_line="$1"
+	tail -n +"$selected_line" | head -n 1
+}
+
 #
 # END helper functions
 #
@@ -389,7 +395,7 @@ cmd_show() {
 			echo "$pass" | $BASE64 -d
 		else
 			[[ $selected_line =~ ^[0-9]+$ ]] || die "Clip location '$selected_line' is not a number."
-			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | tail -n +${selected_line} | head -n 1)" || exit $?
+			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | extract_one_line "$selected_line")" || exit $?
 			[[ -n $pass ]] || die "There is no password at line ${selected_line}."
 			if [[ $clip -eq 1 ]]; then
 				clip "$pass" "$path"
