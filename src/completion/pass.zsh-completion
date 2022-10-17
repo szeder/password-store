@@ -117,7 +117,9 @@ _pass () {
 _pass_cmd_show () {
 	_arguments : \
 		"-c[put it on the clipboard]" \
-		"--clip[put it on the clipboard]"
+		"--clip[put it on the clipboard]" \
+		"-q[display QR code]" \
+		"--qrcode[display QR code]"
 	_pass_complete_entries
 }
 _pass_complete_entries_helper () {
