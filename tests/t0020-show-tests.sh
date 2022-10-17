@@ -47,4 +47,13 @@ test_expect_success 'Test "show --stdout" with out-of-range line-number' '
 	grep "There is no password at line 42" stderr
 '
 
+test_expect_success 'Huge password file should not lead to SIGPIPE' '
+	echo PaSSWoRD >expect &&
+	cat expect >content &&
+	seq 2 100000 >>content &&
+	"$PASS" insert -m huge <content &&
+	"$PASS" show --stdout=1 huge >actual &&
+	test_cmp expect actual
+'
+
 test_done

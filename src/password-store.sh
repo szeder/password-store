@@ -148,8 +148,11 @@ check_sneaky_paths() {
 
 # Extract the given line from standard input.
 extract_one_line() {
+	# Make sure that each pipeline stage reads the whole input to
+	# avoid SIGPIPE.
 	local selected_line="$1"
-	tail -n +"$selected_line" | head -n 1
+	tail -n +"$selected_line" |
+	{ head -n 1 ; cat >/dev/null ; }
 }
 
 #
