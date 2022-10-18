@@ -42,6 +42,19 @@ test_expect_success 'Test "show --stdout"' '
 	test_cmp expect actual
 '
 
+test_expect_success 'Test "show --stdout --strip-field"' '
+	echo "threethree" >expect &&
+	"$PASS" show --stdout=3 --strip-field multiline >actual &&
+	test_cmp expect actual
+'
+
+test_expect_success 'Test "show --stdout --strip-field" with extra colon' '
+	echo "pass: word" >expect &&
+	echo "field: pass: word" | "$PASS" insert -m extra-colon &&
+	"$PASS" show --stdout=1 --strip-field extra-colon >actual &&
+	test_cmp expect actual
+'
+
 test_expect_success 'Test "show --stdout" with out-of-range line-number' '
 	test_must_fail "$PASS" show --stdout=42 multiline 2>stderr &&
 	grep "There is no password at line 42" stderr
