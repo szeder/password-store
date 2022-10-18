@@ -290,7 +290,7 @@ cmd_usage() {
 	        List passwords.
 	    $PROGRAM find pass-names...
 	    	List passwords that match pass-names.
-	    $PROGRAM [show] [--clip[=line-number],-c[line-number],--qrcode[=line-number],-q[line-number],--stdout[=line-number],-s[line-number]] pass-name
+	    $PROGRAM [show] [--clip[=line-number],-c[line-number],--qrcode[=line-number],-q[line-number],--stdout[=line-number],-s[line-number] [--strip-field]] pass-name
 	        Show existing password and optionally put it on the clipboard or display as QR code.
 	        If put on the clipboard, it will be cleared in $CLIP_TIME seconds.
 	        If a line-number is given, then only that line will be copied, displayed or printed from a multiline password.
@@ -373,19 +373,21 @@ cmd_init() {
 }
 
 cmd_show() {
-	local opts selected_line clip=0 qrcode=0 stdout=0
-	opts="$($GETOPT -o q::c::s:: -l qrcode::,clip::,stdout:: -n "$PROGRAM" -- "$@")"
+	local opts selected_line clip=0 qrcode=0 stdout=0 strip_field=0
+	opts="$($GETOPT -o q::c::s:: -l qrcode::,clip::,stdout::,strip-field -n "$PROGRAM" -- "$@")"
 	local err=$?
 	eval set -- "$opts"
 	while true; do case $1 in
 		-q|--qrcode) qrcode=1; selected_line="${2:-1}"; shift 2 ;;
 		-c|--clip) clip=1; selected_line="${2:-1}"; shift 2 ;;
 		-s|--stdout) stdout=1; selected_line="${2:-1}"; shift 2 ;;
+		--strip-field) strip_field=1; shift ;;
 		--) shift; break ;;
 	esac done
 
 	local output_opts=$(( $qrcode + $clip + $stdout ))
-	[[ $err -ne 0 || $output_opts -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [--stdout[=line-number],-s[line-number]] [pass-name]"
+	[[ $err -ne 0 || $output_opts -gt 1 ]] && die "Usage: $PROGRAM $COMMAND [--clip[=line-number],-c[line-number]] [--qrcode[=line-number],-q[line-number]] [--stdout[=line-number],-s[line-number]] [--strip-field] [pass-name]"
+	[[ $output_opts -eq 0 && $strip_field -eq 1 ]] && die "'--strip-field' only works on a specific line"
 
 	local pass
 	local path="$1"
@@ -398,6 +400,7 @@ cmd_show() {
 		else
 			[[ $selected_line =~ ^[0-9]+$ ]] || die "Clip location '$selected_line' is not a number."
 			pass="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | extract_one_line "$selected_line")" || exit $?
+			[[ $strip_field -eq 1 ]] && pass="${pass#*: }"
 			[[ -n $pass ]] || die "There is no password at line ${selected_line}."
 			if [[ $clip -eq 1 ]]; then
 				clip "$pass" "$path"

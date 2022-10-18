@@ -121,7 +121,8 @@ _pass_cmd_show () {
 		"-q[display QR code]" \
 		"--qrcode[display QR code]" \
 		"-s[print to standard output]" \
-		"--stdout[print to standard output]"
+		"--stdout[print to standard output]" \
+		"--strip-field[strip field prefix]"
 	_pass_complete_entries
 }
 _pass_complete_entries_helper () {
