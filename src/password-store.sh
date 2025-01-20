@@ -287,6 +287,7 @@ cmd_usage() {
 	    $PROGRAM [show] [--clip[=line-number],-c[line-number],--qrcode[=line-number],-q[line-number]] pass-name
 	        Show existing password and optionally put it on the clipboard or display as QR code.
 	        If put on the clipboard, it will be cleared in $CLIP_TIME seconds.
+	        If a line-number is given, then only that line will be copied or displayed from a multiline password.
 	    $PROGRAM grep [GREPOPTIONS] search-string
 	        Search for password files containing search-string when decrypted.
 	    $PROGRAM insert [--echo,-e | --multiline,-m] [--force,-f] pass-name

@@ -104,7 +104,8 @@ or
 and then restore the clipboard after 45 (or \fIPASSWORD_STORE_CLIP_TIME\fP) seconds. If \fI--qrcode\fP
 or \fI-q\fP is specified, do not print the password but instead display a QR code using
 .BR qrencode (1)
-either to the terminal or graphically if supported.
+either to the terminal or graphically if supported.  If \fIline-number\fP is specified,
+then only that line will be copied or displayed from a multiline password.
 .TP
 \fBinsert\fP [ \fI--echo\fP, \fI-e\fP | \fI--multiline\fP, \fI-m\fP ] [ \fI--force\fP, \fI-f\fP ] \fIpass-name\fP
 Insert a new password into the password store called \fIpass-name\fP. This will
