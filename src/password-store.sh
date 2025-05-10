@@ -564,6 +564,14 @@ cmd_generate() {
 
 	[[ $inplace -eq 0 && $force -eq 0 && -e $passfile ]] && yesno "An entry already exists for $path. Overwrite it?"
 
+	if [[ -r "$passfile" ]]; then
+		stored_characters="$($GPG -d "${GPG_OPTS[@]}" "$passfile" | extract_one_line 'character-set')"
+		stored_characters="${stored_characters#character-set: }"
+		if [[ -n "$stored_characters" ]]; then
+			characters="$stored_characters"
+		fi
+	fi
+
 	read -r -n $length pass < <(LC_ALL=C tr -dc "$characters" < /dev/urandom)
 	[[ ${#pass} -eq $length ]] || die "Could not generate password from /dev/urandom."
 	if [[ $inplace -eq 0 ]]; then

@@ -16,4 +16,12 @@ test_expect_success 'Test replacement of first line' '
 	[[ $("$PASS" show cred2) == "$(printf "%s\\npassword\\nwith\\nmany\\nlines\\nin it bla bla" "$("$PASS" show cred2 | head -n 1)")" ]]
 '
 
+test_expect_success 'Test generate with stored character set' '
+	"$PASS" insert -m cred3 <<<"$(printf "pwd\ncharacter-set: asdf")" &&
+	"$PASS" generate -i cred3 20 &&
+	p="$("$PASS" show cred3 | head -n 1)" &&
+	[[ $(printf "%s" "$p" | wc -m) -eq 20 ]] &&
+	[[ -z "${p//[asdf]}" ]]
+'
+
 test_done
